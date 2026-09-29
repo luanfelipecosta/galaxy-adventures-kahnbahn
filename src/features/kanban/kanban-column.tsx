@@ -13,12 +13,14 @@ import {
   isKanbanColumnDropTargetData,
 } from './kanban.utils'
 import { KanbanCard } from './kanban-card'
+import { KanbanColumnEmptyState } from './kanban-column-empty-state'
 import { useFlipList } from './use-flip-list'
 
 type KanbanColumnProps = {
   activeDragItemId: string | null
   assigneesById: Map<string, KanbanAssignee>
   column: KanbanColumnType
+  hasActiveFilters: boolean
   items: KanbanItem[]
   onDragEnd: () => void
   onDragStart: (item: KanbanItem) => void
@@ -30,6 +32,7 @@ export const KanbanColumn = ({
   activeDragItemId,
   assigneesById,
   column,
+  hasActiveFilters,
   items,
   onDragEnd,
   onDragStart,
@@ -154,7 +157,7 @@ export const KanbanColumn = ({
             )
           })
         ) : (
-          <div className="rounded-lg border border-dashed border-border bg-card/70 p-4 text-sm text-muted-foreground">No items</div>
+          <KanbanColumnEmptyState hasActiveFilters={hasActiveFilters} />
         )}
       </div>
     </section>
