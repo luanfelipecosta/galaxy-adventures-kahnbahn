@@ -1,0 +1,86 @@
+[
+  {
+    "id": "item-rocket-itinerary",
+    "title": "Draft moon market itinerary",
+    "descriptionMarkdown": "Outline the first three stops, supply windows, and handoff notes for the lunar bazaar route.",
+    "assigneeId": null,
+    "status": "to-do",
+    "position": 1000,
+    "priority": "medium",
+    "labels": ["planning", "route"],
+    "createdAt": "2026-09-20T14:10:00.000Z",
+    "updatedAt": "2026-09-20T14:10:00.000Z",
+    "logs": [
+      {
+        "id": "log-rocket-itinerary-created",
+        "type": "created",
+        "message": "Item created in To do.",
+        "createdAt": "2026-09-20T14:10:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "item-navigation-check",
+    "title": "Verify nebula navigation checks",
+    "descriptionMarkdown": "Run through edge cases for low-visibility travel and document any manual override steps.",
+    "assigneeId": null,
+    "status": "doing",
+    "position": 1000,
+    "priority": "high",
+    "labels": ["navigation", "risk"],
+    "createdAt": "2026-09-21T09:30:00.000Z",
+    "updatedAt": "2026-09-22T11:45:00.000Z",
+    "logs": [
+      {
+        "id": "log-navigation-check-created",
+        "type": "created",
+        "message": "Item created in To do.",
+        "createdAt": "2026-09-21T09:30:00.000Z"
+      },
+      {
+        "id": "log-navigation-check-status",
+        "type": "status",
+        "message": "Moved from To do to Doing.",
+        "createdAt": "2026-09-22T11:45:00.000Z",
+        "fromStatus": "to-do",
+        "toStatus": "doing"
+      }
+    ]
+  },
+  {
+    "id": "item-cargo-manifest",
+    "title": "Publish cargo manifest template",
+    "descriptionMarkdown": "Finalize the lightweight manifest fields and share the template with mission ops.",
+    "assigneeId": null,
+    "status": "done",
+    "position": 1000,
+    "priority": "low",
+    "labels": ["ops", "template"],
+    "createdAt": "2026-09-18T16:05:00.000Z",
+    "updatedAt": "2026-09-23T18:20:00.000Z",
+    "logs": [
+      {
+        "id": "log-cargo-manifest-created",
+        "type": "created",
+        "message": "Item created in To do.",
+        "createdAt": "2026-09-18T16:05:00.000Z"
+      },
+      {
+        "id": "log-cargo-manifest-doing",
+        "type": "status",
+        "message": "Moved from To do to Doing.",
+        "createdAt": "2026-09-19T10:00:00.000Z",
+        "fromStatus": "to-do",
+        "toStatus": "doing"
+      },
+      {
+        "id": "log-cargo-manifest-done",
+        "type": "status",
+        "message": "Moved from Doing to Done.",
+        "createdAt": "2026-09-23T18:20:00.000Z",
+        "fromStatus": "doing",
+        "toStatus": "done"
+      }
+    ]
+  }
+]
