@@ -160,6 +160,24 @@ export const useSelectedId = (initialId: string | null = null) => {
 }
 ```
 
+## Testing
+
+- Use Vitest for frontend tests.
+- Use React Testing Library for rendered component and integration behavior.
+- Use MSW handlers for REST and GraphQL network behavior instead of mocking
+  fetch directly in individual tests.
+- Use `renderWithProviders` from `src/test/test-utils.tsx` when a component
+  needs TanStack Query.
+- Keep QueryClient instances isolated per test and disable retries in test
+  clients.
+- Prefer integration tests for Kanban flows where providers, queries,
+  mutations, dialogs, and filters interact.
+- Use focused unit tests for pure helpers in `model` files.
+- Do not physically simulate drag-and-drop in jsdom. Cover movement rules with
+  utilities and status-change flows with integration tests.
+- Put deterministic shared fixtures in `src/test` when multiple test files need
+  the same data shape.
+
 ## Review Checklist
 
 - Components use arrow functions and named exports.
@@ -167,4 +185,6 @@ export const useSelectedId = (initialId: string | null = null) => {
 - Types, utilities, constants, and rendering are separated when useful.
 - shadcn/ui primitives remain in `src/components/ui`.
 - Tailwind classes use semantic tokens and stable layout utilities.
+- Tests use Vitest, React Testing Library, and MSW where user-facing behavior or
+  network calls are involved.
 - No unnecessary custom CSS, broad abstractions, or untyped data paths were added.
