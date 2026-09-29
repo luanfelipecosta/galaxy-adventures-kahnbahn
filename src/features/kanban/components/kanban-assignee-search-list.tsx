@@ -3,7 +3,7 @@ import { CheckIcon } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { KanbanAssigneeAvatar } from './kanban-assignee-avatar'
-import type { KanbanAssignee } from './kanban.types'
+import type { KanbanAssignee } from '../model/kanban.types'
 
 type KanbanAssigneeSearchListProps = {
   assignees: KanbanAssignee[]

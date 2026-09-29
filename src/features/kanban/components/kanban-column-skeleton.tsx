@@ -1,7 +1,7 @@
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { KanbanCardSkeleton } from './kanban-card-skeleton'
-import type { KanbanColumn as KanbanColumnType } from './kanban.types'
+import type { KanbanColumn as KanbanColumnType } from '../model/kanban.types'
 
 type KanbanColumnSkeletonProps = {
   column: KanbanColumnType

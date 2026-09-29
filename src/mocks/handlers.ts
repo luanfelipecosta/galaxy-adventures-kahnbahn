@@ -2,10 +2,18 @@ import { delay, http, HttpResponse } from 'msw'
 
 import seedKanbanItems from './data/kanban-items.json'
 
-import { KANBAN_PRIORITIES } from '@/features/kanban/kanban.constants'
-import type { KanbanItem, KanbanItemCreateInput, KanbanItemPatchInput, KanbanItemResponse, KanbanItemsResponse } from '@/features/kanban'
-import { canMoveItem } from '@/features/kanban'
-import { formatStatus, getNextPosition, isKanbanStatus } from '@/features/kanban/kanban.utils'
+import {
+  canMoveItem,
+  formatStatus,
+  getNextPosition,
+  isKanbanStatus,
+  KANBAN_PRIORITIES,
+  type KanbanItem,
+  type KanbanItemCreateInput,
+  type KanbanItemPatchInput,
+  type KanbanItemResponse,
+  type KanbanItemsResponse,
+} from '@/features/kanban'
 
 const MOCK_DELAY_IN_MS = 650
 

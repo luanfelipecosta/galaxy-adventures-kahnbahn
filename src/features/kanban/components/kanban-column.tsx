@@ -1,60 +1,49 @@
 import { dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/adapter/element-adapter'
 import { getReorderDestinationIndex } from '@atlaskit/pragmatic-drag-and-drop-hitbox/util/get-reorder-destination-index'
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/utils/combine'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { KANBAN_COLUMN_DROP_TARGET_DATA_TYPE } from './kanban.constants'
-import type { KanbanAssignee, KanbanColumn as KanbanColumnType, KanbanDropEdge, KanbanItem, KanbanStatus } from './kanban.types'
+import { KANBAN_COLUMN_DROP_TARGET_DATA_TYPE } from '../model/kanban.constants'
+import type { KanbanColumn as KanbanColumnType, KanbanDropEdge, KanbanItem, KanbanStatus } from '../model/kanban.types'
 import {
   canMoveItem,
   getHitboxEdgeFromKanbanDropEdge,
   isKanbanCardDragData,
   isKanbanCardDropTargetData,
   isKanbanColumnDropTargetData,
-} from './kanban.utils'
+} from '../model/kanban.utils'
 import { KanbanCard } from './kanban-card'
 import { KanbanColumnEmptyState } from './kanban-column-empty-state'
-import { useFlipList } from './use-flip-list'
+import { useFlipList } from '../hooks/use-flip-list'
+import { useKanbanBoardActions, useKanbanBoardState } from '../state/kanban-board-state'
 
 type KanbanColumnProps = {
-  activeDragItemId: string | null
-  assigneesById: Map<string, KanbanAssignee>
   column: KanbanColumnType
-  hasActiveFilters: boolean
-  isAssignedAssigneesLoading: boolean
   items: KanbanItem[]
-  onDragEnd: () => void
-  onDragStart: (item: KanbanItem) => void
-  onEditItem: (item: KanbanItem) => void
-  onMoveItem: (itemId: string, status: KanbanStatus, index: number) => void
 }
 
 export const KanbanColumn = ({
-  activeDragItemId,
-  assigneesById,
   column,
-  hasActiveFilters,
-  isAssignedAssigneesLoading,
   items,
-  onDragEnd,
-  onDragStart,
-  onEditItem,
-  onMoveItem,
 }: KanbanColumnProps) => {
+  const { activeDragItemId, assigneesById, hasActiveFilters, isAssignedAssigneesLoading } = useKanbanBoardState()
+  const { moveItem } = useKanbanBoardActions()
   const columnRef = useRef<HTMLDivElement | null>(null)
   const listRef = useRef<HTMLDivElement | null>(null)
   const [isDraggedOver, setIsDraggedOver] = useState(false)
-  const animationKey = items.map((item) => item.id).join('|')
+  const itemIdsKey = items.map((item) => item.id).join('|')
+  const itemIds = useMemo(() => (itemIdsKey ? itemIdsKey.split('|') : []), [itemIdsKey])
+  const itemCount = itemIds.length
 
   useFlipList({
-    dependencies: [animationKey],
+    dependencies: [itemIdsKey],
     listRef,
   })
 
-  const getInsertionIndex = (sourceItemId: string, sourceStatus: KanbanStatus, targetItemId: string, edge: KanbanDropEdge) => {
+  const getInsertionIndex = useCallback((sourceItemId: string, sourceStatus: KanbanStatus, targetItemId: string, edge: KanbanDropEdge) => {
     if (sourceStatus === column.id) {
-      const startIndex = items.findIndex((item) => item.id === sourceItemId)
-      const targetIndex = items.findIndex((item) => item.id === targetItemId)
+      const startIndex = itemIds.indexOf(sourceItemId)
+      const targetIndex = itemIds.indexOf(targetItemId)
 
       if (startIndex !== -1 && targetIndex !== -1) {
         return getReorderDestinationIndex({
@@ -66,15 +55,15 @@ export const KanbanColumn = ({
       }
     }
 
-    const itemsWithoutSource = items.filter((item) => item.id !== sourceItemId)
-    const targetIndex = itemsWithoutSource.findIndex((item) => item.id === targetItemId)
+    const itemIdsWithoutSource = itemIds.filter((itemId) => itemId !== sourceItemId)
+    const targetIndex = itemIdsWithoutSource.indexOf(targetItemId)
 
     if (targetIndex === -1) {
-      return itemsWithoutSource.length
+      return itemIdsWithoutSource.length
     }
 
     return edge === 'before' ? targetIndex : targetIndex + 1
-  }
+  }, [column.id, itemIds])
 
   useEffect(() => {
     const element = columnRef.current
@@ -109,7 +98,7 @@ export const KanbanColumn = ({
           const [innerMostTarget] = location.current.dropTargets
 
           if (innerMostTarget && isKanbanCardDropTargetData(innerMostTarget.data)) {
-            onMoveItem(
+            moveItem(
               source.data.itemId,
               column.id,
               getInsertionIndex(source.data.itemId, source.data.status, innerMostTarget.data.itemId, innerMostTarget.data.edge),
@@ -119,12 +108,12 @@ export const KanbanColumn = ({
           }
 
           if (innerMostTarget && isKanbanColumnDropTargetData(innerMostTarget.data)) {
-            onMoveItem(source.data.itemId, column.id, items.filter((item) => item.id !== source.data.itemId).length)
+            moveItem(source.data.itemId, column.id, itemIds.filter((itemId) => itemId !== source.data.itemId).length)
           }
         },
       }),
     )
-  }, [column.id, items, onMoveItem])
+  }, [column.id, getInsertionIndex, itemCount, itemIds, itemIdsKey, moveItem])
 
   return (
     <section
@@ -153,9 +142,6 @@ export const KanbanColumn = ({
                 isAssigneeLoading={isAssignedAssigneesLoading}
                 isDragSource={isDragSource}
                 item={item}
-                onDragEnd={onDragEnd}
-                onDragStart={onDragStart}
-                onEdit={onEditItem}
               />
             )
           })

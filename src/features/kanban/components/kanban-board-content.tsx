@@ -1,39 +1,13 @@
 import { SearchXIcon, SparklesIcon } from 'lucide-react'
 
-import { KANBAN_COLUMNS } from './kanban.constants'
-import type { KanbanAssignee, KanbanItemsByStatus, KanbanItem, KanbanStatus } from './kanban.types'
+import { KANBAN_COLUMNS } from '../model/kanban.constants'
+import { useKanbanBoardState } from '../state/kanban-board-state'
 import { KanbanColumn } from './kanban-column'
 import { KanbanColumnSkeleton } from './kanban-column-skeleton'
 
-type KanbanBoardContentProps = {
-  activeDragItemId: string | null
-  assigneesById: Map<string, KanbanAssignee>
-  hasActiveFilters: boolean
-  isAssignedAssigneesLoading: boolean
-  isLoading: boolean
-  items: KanbanItem[]
-  itemsByStatus: KanbanItemsByStatus
-  visibleItems: KanbanItem[]
-  onDragEnd: () => void
-  onDragStart: (item: KanbanItem) => void
-  onEditItem: (item: KanbanItem) => void
-  onMoveItem: (itemId: string, status: KanbanStatus, index: number) => void
-}
+export const KanbanBoardContent = () => {
+  const { hasActiveFilters, isLoading, items, itemsByStatus, visibleItems } = useKanbanBoardState()
 
-export const KanbanBoardContent = ({
-  activeDragItemId,
-  assigneesById,
-  hasActiveFilters,
-  isAssignedAssigneesLoading,
-  isLoading,
-  items,
-  itemsByStatus,
-  visibleItems,
-  onDragEnd,
-  onDragStart,
-  onEditItem,
-  onMoveItem,
-}: KanbanBoardContentProps) => {
   if (isLoading) {
     return (
       <div className="-mx-5 min-h-0 flex-1 overflow-x-auto scroll-px-5 snap-x snap-mandatory px-5 pb-3 sm:-mx-8 sm:scroll-px-8 sm:px-8 md:mx-0 md:px-0">
@@ -76,16 +50,8 @@ export const KanbanBoardContent = ({
           return (
             <KanbanColumn
               key={column.id}
-              activeDragItemId={activeDragItemId}
-              assigneesById={assigneesById}
               column={column}
-              hasActiveFilters={hasActiveFilters}
-              isAssignedAssigneesLoading={isAssignedAssigneesLoading}
               items={itemsByStatus[column.id]}
-              onEditItem={onEditItem}
-              onMoveItem={onMoveItem}
-              onDragEnd={onDragEnd}
-              onDragStart={onDragStart}
             />
           )
         })}

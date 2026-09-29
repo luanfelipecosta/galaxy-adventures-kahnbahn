@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
-import type { KanbanAssignee } from './kanban.types'
-import { getAssigneeInitials } from './kanban.utils'
+import type { KanbanAssignee } from '../model/kanban.types'
+import { getAssigneeInitials } from '../model/kanban.utils'
 
 type KanbanAssigneeAvatarProps = {
   assignee: KanbanAssignee | null

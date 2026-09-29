@@ -1,5 +1,6 @@
 export { KanbanBoard } from './kanban-board'
-export { canMoveItem } from './kanban.utils'
+export { KANBAN_PRIORITIES } from './model/kanban.constants'
+export { canMoveItem, formatStatus, getNextPosition, isKanbanStatus } from './model/kanban.utils'
 export type {
   KanbanColumn,
   KanbanItem,
@@ -10,4 +11,4 @@ export type {
   KanbanItemsResponse,
   KanbanPriority,
   KanbanStatus,
-} from './kanban.types'
+} from './model/kanban.types'

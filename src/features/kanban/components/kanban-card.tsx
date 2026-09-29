@@ -7,8 +7,8 @@ import { useEffect, useRef, useState } from 'react'
 
 import { Skeleton } from '@/components/ui/skeleton'
 
-import { KANBAN_CARD_DROP_TARGET_DATA_TYPE, KANBAN_DRAG_DATA_TYPE } from './kanban.constants'
-import type { KanbanAssignee, KanbanDropEdge, KanbanItem } from './kanban.types'
+import { KANBAN_CARD_DROP_TARGET_DATA_TYPE, KANBAN_DRAG_DATA_TYPE } from '../model/kanban.constants'
+import type { KanbanAssignee, KanbanDropEdge, KanbanItem } from '../model/kanban.types'
 import {
   canMoveItem,
   formatPriority,
@@ -16,7 +16,8 @@ import {
   getSnappedKanbanDropEdge,
   isKanbanCardDragData,
   isKanbanCardDropTargetData,
-} from './kanban.utils'
+} from '../model/kanban.utils'
+import { useKanbanBoardActions } from '../state/kanban-board-state'
 import { KanbanAssigneeAvatar } from './kanban-assignee-avatar'
 
 type KanbanCardProps = {
@@ -25,9 +26,6 @@ type KanbanCardProps = {
   isAssigneeLoading: boolean
   isDragSource: boolean
   item: KanbanItem
-  onDragEnd: () => void
-  onDragStart: (item: KanbanItem) => void
-  onEdit: (item: KanbanItem) => void
 }
 
 const priorityClassNames: Record<KanbanItem['priority'], string> = {
@@ -42,10 +40,8 @@ export const KanbanCard = ({
   isAssigneeLoading,
   isDragSource,
   item,
-  onDragEnd,
-  onDragStart,
-  onEdit,
 }: KanbanCardProps) => {
+  const { editItem, startDraggingItem, stopDraggingItem } = useKanbanBoardActions()
   const cardRef = useRef<HTMLElement | null>(null)
   const lastEdgeRef = useRef<KanbanDropEdge | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -53,6 +49,8 @@ export const KanbanCard = ({
   const description = item.descriptionMarkdown.trim() || 'No description'
   const shouldShowAssigneeSkeleton = !assignee && isAssigneeLoading
   const assigneeName = assignee?.name ?? 'Unknown assignee'
+  const itemId = item.id
+  const itemStatus = item.status
 
   useEffect(() => {
     const element = cardRef.current
@@ -66,18 +64,18 @@ export const KanbanCard = ({
         element,
         getInitialData: () => ({
           type: KANBAN_DRAG_DATA_TYPE,
-          itemId: item.id,
-          status: item.status,
+          itemId,
+          status: itemStatus,
         }),
         onDragStart: () => {
           lastEdgeRef.current = null
-          onDragStart(item)
+          startDraggingItem({ id: itemId })
           setIsDragging(true)
         },
         onDrop: () => {
           lastEdgeRef.current = null
           setIsDragging(false)
-          onDragEnd()
+          stopDraggingItem()
         },
       }),
       dropTargetForElements({
@@ -86,8 +84,8 @@ export const KanbanCard = ({
           const data = attachClosestEdge(
             {
               type: KANBAN_CARD_DROP_TARGET_DATA_TYPE,
-              itemId: item.id,
-              status: item.status,
+              itemId,
+              status: itemStatus,
             },
             {
               allowedEdges: ['top', 'bottom'],
@@ -113,8 +111,8 @@ export const KanbanCard = ({
         canDrop: ({ source }) => {
           return (
             isKanbanCardDragData(source.data) &&
-            source.data.itemId !== item.id &&
-            canMoveItem(source.data.status, item.status)
+            source.data.itemId !== itemId &&
+            canMoveItem(source.data.status, itemStatus)
           )
         },
         onDrag: ({ self, source }) => {
@@ -141,7 +139,7 @@ export const KanbanCard = ({
         onDrop: () => setDropEdge(null),
       }),
     )
-  }, [item, onDragEnd, onDragStart])
+  }, [itemId, itemStatus, startDraggingItem, stopDraggingItem])
 
   return (
     <article
@@ -161,7 +159,7 @@ export const KanbanCard = ({
           <button
             type="button"
             className="block max-w-full cursor-pointer truncate text-left text-sm font-semibold leading-5 transition-colors hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            onClick={() => onEdit(item)}
+            onClick={() => editItem(item)}
             title={item.title}
           >
             {item.title}
@@ -173,7 +171,7 @@ export const KanbanCard = ({
         <button
           type="button"
           className="inline-flex size-8 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground transition hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          onClick={() => onEdit(item)}
+          onClick={() => editItem(item)}
           aria-label={`Edit ${item.title}`}
         >
           <Edit3Icon className="size-4" aria-hidden="true" />

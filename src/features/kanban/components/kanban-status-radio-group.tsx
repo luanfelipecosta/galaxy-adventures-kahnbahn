@@ -2,7 +2,7 @@ import { CheckCircle2Icon, CircleIcon, Clock3Icon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 
-import type { KanbanColumn, KanbanStatus } from './kanban.types'
+import type { KanbanColumn, KanbanStatus } from '../model/kanban.types'
 
 type KanbanStatusRadioOption = KanbanColumn & {
   disabled: boolean

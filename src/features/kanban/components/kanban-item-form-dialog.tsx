@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -16,11 +17,11 @@ import { cn } from '@/lib/utils'
 import { useCharactersQuery } from '@/lib/react-query/queries'
 
 import { KanbanAssigneePicker } from './kanban-assignee-picker'
-import { KANBAN_COLUMNS, KANBAN_PRIORITIES } from './kanban.constants'
+import { KANBAN_COLUMNS, KANBAN_PRIORITIES } from '../model/kanban.constants'
 import { KanbanMarkdownDescriptionField } from './kanban-markdown-description-field'
 import { KanbanStatusRadioGroup } from './kanban-status-radio-group'
-import type { KanbanAssignee, KanbanItem, KanbanItemCreateInput, KanbanItemPatchInput, KanbanPriority, KanbanStatus } from './kanban.types'
-import { canMoveItem, mergeAssigneesById, normalizeCharacterAssignees, normalizeLabels, sortAssigneesForBoard } from './kanban.utils'
+import type { KanbanAssignee, KanbanItem, KanbanItemCreateInput, KanbanItemPatchInput, KanbanPriority, KanbanStatus } from '../model/kanban.types'
+import { canMoveItem, mergeAssigneesById, normalizeCharacterAssignees, normalizeLabels, sortAssigneesForBoard } from '../model/kanban.utils'
 
 type KanbanItemFormValues = {
   title: string
@@ -47,10 +48,6 @@ const fieldClassName =
 
 const labelClassName = 'grid gap-1.5 text-sm font-medium'
 const errorClassName = 'text-xs font-medium text-destructive'
-const primaryButtonClassName =
-  'inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary-foreground px-4 py-2 text-sm font-semibold text-white transition-[background-color,opacity,transform] duration-150 ease-[var(--ease-out-quart)] hover:bg-foreground active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 disabled:active:translate-y-0'
-const secondaryButtonClassName =
-  'inline-flex min-h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-semibold text-primary-foreground transition-[background-color,color,opacity,transform] duration-150 ease-[var(--ease-out-quart)] hover:bg-secondary hover:text-foreground active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60 disabled:active:translate-y-0'
 
 const kanbanItemFormSchema = z.object({
   title: z.string().trim().min(1, 'Title is required').max(120, 'Title must be 120 characters or fewer'),
@@ -268,17 +265,16 @@ export const KanbanItemFormDialog = ({
           ) : null}
 
           <DialogFooter>
-            <button
+            <Button
               type="button"
-              className={secondaryButtonClassName}
+              variant="secondary"
               disabled={isSaving}
               onClick={() => handleOpenChange(false)}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className={primaryButtonClassName}
               disabled={isSaving}
               aria-busy={isSaving}
             >
@@ -288,7 +284,7 @@ export const KanbanItemFormDialog = ({
                 <SaveIcon className="size-4" aria-hidden="true" />
               )}
               {isSaving ? 'Saving' : 'Save'}
-            </button>
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

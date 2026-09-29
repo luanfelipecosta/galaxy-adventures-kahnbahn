@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
 
-import { createKanbanItem, getKanbanItems, patchKanbanItem } from './kanban-api'
-import { KANBAN_QUERY_KEYS } from './kanban.constants'
-import type { KanbanItem, KanbanItemCreateInput, KanbanItemPatchInput } from './kanban.types'
+import { createKanbanItem, getKanbanItems, patchKanbanItem } from '../api/kanban-api'
+import { KANBAN_QUERY_KEYS } from '../model/kanban.constants'
+import type { KanbanItem, KanbanItemCreateInput, KanbanItemPatchInput } from '../model/kanban.types'
 
 type UpdateKanbanItemVariables = {
   itemId: string
@@ -79,13 +80,13 @@ export const useKanbanBoard = () => {
     },
   })
 
-  const createItem = async (input: KanbanItemCreateInput) => {
+  const createItem = useCallback(async (input: KanbanItemCreateInput) => {
     return createMutation.mutateAsync(input)
-  }
+  }, [createMutation])
 
-  const updateItem = async (itemId: string, input: KanbanItemPatchInput) => {
+  const updateItem = useCallback(async (itemId: string, input: KanbanItemPatchInput) => {
     return updateMutation.mutateAsync({ itemId, input })
-  }
+  }, [updateMutation])
 
   return {
     items: itemsQuery.data ?? [],

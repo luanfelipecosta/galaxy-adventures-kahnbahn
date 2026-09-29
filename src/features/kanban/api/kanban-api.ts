@@ -1,4 +1,4 @@
-import type { KanbanItemCreateInput, KanbanItemPatchInput, KanbanItemResponse, KanbanItemsResponse } from './kanban.types'
+import type { KanbanItemCreateInput, KanbanItemPatchInput, KanbanItemResponse, KanbanItemsResponse } from '../model/kanban.types'
 
 const getJson = async <ResponseBody>(url: string, init?: RequestInit): Promise<ResponseBody> => {
   const response = await fetch(url, {
