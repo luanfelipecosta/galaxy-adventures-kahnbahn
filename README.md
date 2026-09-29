@@ -1,4 +1,6 @@
 # Galaxy Adventures Kanban
+<img width="1408" height="937" alt="Arc 2026-09-29 04 15 07" src="https://github.com/user-attachments/assets/ac5bfac2-f90c-456b-a0dc-9265570d6e34" />
+
 
 A frontend-only Kanban board for planning galaxy adventures with Rick and Morty character assignees. The app combines a polished board interaction model, searchable character data from GraphQL, mocked Kanban persistence, and responsive dashboard styling.
 
