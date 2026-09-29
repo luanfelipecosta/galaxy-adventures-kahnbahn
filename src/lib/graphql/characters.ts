@@ -1,36 +1,23 @@
-import charactersQuery from './queries/characters.query?raw'
 import { requestGraphQL } from './client'
+import {
+  CharactersByIdsDocument,
+  CharactersDocument,
+  type CharactersByIdsQuery,
+  type CharactersByIdsQueryVariables,
+  type CharactersQuery,
+  type CharactersQueryVariables,
+} from './generated'
 
-export type CharacterStatus = 'Alive' | 'Dead' | 'unknown'
-
-export type CharacterListItem = {
-  id: string
-  name: string
-  image: string
-  species: string
-  status: CharacterStatus
+export const getCharacters = (variables: CharactersQueryVariables) => {
+  return requestGraphQL<CharactersQuery, CharactersQueryVariables>({
+    document: CharactersDocument,
+    variables,
+  })
 }
 
-export type CharactersQueryVariables = {
-  page?: number
-  name?: string
-}
-
-export type CharactersQueryResult = {
-  characters: {
-    info: {
-      count: number
-      pages: number
-      next: number | null
-      prev: number | null
-    }
-    results: CharacterListItem[]
-  }
-}
-
-export const getCharacters = (variables: CharactersQueryVariables = {}) => {
-  return requestGraphQL<CharactersQueryResult, CharactersQueryVariables>({
-    document: charactersQuery,
+export const getCharactersByIds = (variables: CharactersByIdsQueryVariables) => {
+  return requestGraphQL<CharactersByIdsQuery, CharactersByIdsQueryVariables>({
+    document: CharactersByIdsDocument,
     variables,
   })
 }

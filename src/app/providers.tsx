@@ -1,12 +1,14 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
+import { useState } from 'react'
+
+import { createQueryClient, QueryProvider } from '@/lib/react-query'
 
 type AppProvidersProps = {
   children: ReactNode
 }
 
-const queryClient = new QueryClient()
-
 export const AppProviders = ({ children }: AppProvidersProps) => {
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  const [queryClient] = useState(createQueryClient)
+
+  return <QueryProvider client={queryClient}>{children}</QueryProvider>
 }
