@@ -1,6 +1,9 @@
-import { CheckIcon, FilterIcon, MoreHorizontalIcon, PlusIcon, UserRoundIcon } from 'lucide-react'
+import { CheckIcon, FilterIcon, MoreHorizontalIcon, PlusIcon } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
+import { Skeleton } from '@/components/ui/skeleton'
+
+import { KanbanAssigneeSearchList } from './kanban-assignee-search-list'
 import type { KanbanAssignee, KanbanAssigneeFilter, KanbanPriority } from './kanban.types'
 import { KanbanAssigneeAvatar } from './kanban-assignee-avatar'
 
@@ -133,6 +136,13 @@ export const KanbanBoardControlBar = ({
       </div>
 
       <div className="relative flex min-w-0 items-center gap-1" aria-label="Filter items by assignee">
+        {isAssigneeLoading && quickAssignees.length === 0 ? (
+          <>
+            <Skeleton className="-ml-2 first:ml-0 size-10 rounded-full border-2 border-card" />
+            <Skeleton className="-ml-2 first:ml-0 size-10 rounded-full border-2 border-card" />
+            <Skeleton className="-ml-2 first:ml-0 size-10 rounded-full border-2 border-card" />
+          </>
+        ) : null}
         {quickAssignees.map((assignee) => {
           const isSelected = assigneeFilter === assignee.id
 
@@ -179,80 +189,19 @@ export const KanbanBoardControlBar = ({
             role="menu"
             aria-label="Filter items by assignee"
           >
-            <div className="grid gap-2">
-              <label className="grid gap-1.5 text-xs font-medium text-muted-foreground">
-                Assignee
-                <input
-                  className="w-full rounded-md border border-input bg-card px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
-                  value={assigneeSearch}
-                  placeholder="Search characters"
-                  onChange={(event) => onAssigneeSearchChange(event.target.value)}
-                />
-              </label>
-              <div className="grid max-h-64 gap-1 overflow-y-auto">
-                <button
-                  type="button"
-                  className="flex min-h-9 items-center justify-between gap-3 rounded-md px-3 py-2 text-left text-sm text-muted-foreground transition hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  role="menuitemradio"
-                  aria-checked={assigneeFilter === 'all'}
-                  onClick={() => {
-                    onAssigneeFilterChange('all')
-                    onAssigneeFilterOpenChange(false)
-                  }}
-                >
-                  <span>All assignees</span>
-                  {assigneeFilter === 'all' ? <CheckIcon className="size-4" aria-hidden="true" /> : null}
-                </button>
-                <button
-                  type="button"
-                  className="flex min-h-9 items-center justify-between gap-3 rounded-md px-3 py-2 text-left text-sm text-muted-foreground transition hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  role="menuitemradio"
-                  aria-checked={assigneeFilter === 'unassigned'}
-                  onClick={() => {
-                    onAssigneeFilterChange('unassigned')
-                    onAssigneeFilterOpenChange(false)
-                  }}
-                >
-                  <span className="inline-flex items-center gap-2">
-                    <UserRoundIcon className="size-4" aria-hidden="true" />
-                    Unassigned
-                  </span>
-                  {assigneeFilter === 'unassigned' ? <CheckIcon className="size-4" aria-hidden="true" /> : null}
-                </button>
-                {assignees.map((assignee) => {
-                  const isSelected = assigneeFilter === assignee.id
-
-                  return (
-                    <button
-                      key={assignee.id}
-                      type="button"
-                      className="flex min-h-10 items-center justify-between gap-3 rounded-md px-3 py-2 text-left text-sm text-muted-foreground transition hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      role="menuitemradio"
-                      aria-checked={isSelected}
-                      onClick={() => {
-                        onAssigneeFilterChange(assignee.id)
-                        onAssigneeFilterOpenChange(false)
-                      }}
-                    >
-                      <span className="inline-flex min-w-0 items-center gap-2">
-                        <span className="inline-flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-secondary text-[0.65rem] font-semibold text-primary-foreground">
-                          <KanbanAssigneeAvatar
-                            assignee={assignee}
-                            name={assignee.name}
-                            className="inline-flex size-full items-center justify-center overflow-hidden rounded-full bg-secondary text-[0.65rem] font-semibold text-primary-foreground"
-                          />
-                        </span>
-                        <span className="min-w-0 truncate">{assignee.name}</span>
-                      </span>
-                      {isSelected ? <CheckIcon className="size-4 shrink-0" aria-hidden="true" /> : null}
-                    </button>
-                  )
-                })}
-                {isAssigneeLoading ? <p className="px-3 py-2 text-xs text-muted-foreground">Loading characters...</p> : null}
-                {!isAssigneeLoading && assignees.length === 0 ? <p className="px-3 py-2 text-xs text-muted-foreground">No characters found.</p> : null}
-                {isAssigneeError ? <p className="px-3 py-2 text-xs font-medium text-destructive">Characters could not be loaded.</p> : null}
-              </div>
-            </div>
+            <KanbanAssigneeSearchList
+              allOptionLabel="All assignees"
+              assignees={assignees}
+              isError={isAssigneeError}
+              isLoading={isAssigneeLoading}
+              search={assigneeSearch}
+              selectedValue={assigneeFilter}
+              onSearchChange={onAssigneeSearchChange}
+              onSelect={(assigneeId) => {
+                onAssigneeFilterChange(assigneeId)
+                onAssigneeFilterOpenChange(false)
+              }}
+            />
           </div>
         ) : null}
       </div>

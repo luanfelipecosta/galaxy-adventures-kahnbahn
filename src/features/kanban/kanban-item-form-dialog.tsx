@@ -1,4 +1,4 @@
-import { SaveIcon } from 'lucide-react'
+import { LoaderCircleIcon, SaveIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -15,7 +15,10 @@ import {
 import { cn } from '@/lib/utils'
 import { useCharactersQuery } from '@/lib/react-query/queries'
 
+import { KanbanAssigneePicker } from './kanban-assignee-picker'
 import { KANBAN_COLUMNS, KANBAN_PRIORITIES } from './kanban.constants'
+import { KanbanMarkdownDescriptionField } from './kanban-markdown-description-field'
+import { KanbanStatusRadioGroup } from './kanban-status-radio-group'
 import type { KanbanAssignee, KanbanItem, KanbanItemCreateInput, KanbanItemPatchInput, KanbanPriority, KanbanStatus } from './kanban.types'
 import { canMoveItem, mergeAssigneesById, normalizeCharacterAssignees, normalizeLabels, sortAssigneesForBoard } from './kanban.utils'
 
@@ -26,7 +29,6 @@ type KanbanItemFormValues = {
   priority: KanbanPriority
   labels: string
   status: KanbanStatus
-  position: number
 }
 
 type KanbanItemFormDialogProps = {
@@ -36,8 +38,8 @@ type KanbanItemFormDialogProps = {
   isSaving: boolean
   assignedAssignees: KanbanAssignee[]
   onOpenChange: (open: boolean) => void
-  onCreate: (input: KanbanItemCreateInput) => Promise<void>
-  onUpdate: (itemId: string, input: KanbanItemPatchInput) => Promise<void>
+  onCreate: (input: KanbanItemCreateInput) => Promise<unknown>
+  onUpdate: (itemId: string, input: KanbanItemPatchInput) => Promise<unknown>
 }
 
 const fieldClassName =
@@ -72,7 +74,6 @@ const kanbanItemFormSchema = z.object({
     },
     { message: 'Choose a valid status' },
   ),
-  position: z.number({ error: 'Position is required' }).int('Position must be a whole number').min(0, 'Position must be 0 or greater'),
 })
 
 const getFormValues = (item?: KanbanItem | null): KanbanItemFormValues => {
@@ -83,7 +84,6 @@ const getFormValues = (item?: KanbanItem | null): KanbanItemFormValues => {
     priority: item?.priority ?? 'medium',
     labels: item?.labels.join(', ') ?? '',
     status: item?.status ?? 'to-do',
-    position: item?.position ?? 1000,
   }
 }
 
@@ -110,11 +110,17 @@ export const KanbanItemFormDialog = ({
     handleSubmit,
     register,
     reset,
+    setValue,
+    trigger,
+    watch,
   } = useForm<KanbanItemFormValues>({
     defaultValues: getFormValues(item),
     mode: 'onBlur',
     resolver: zodResolver(kanbanItemFormSchema),
   })
+  const selectedAssigneeId = watch('assigneeId')
+  const selectedStatus = watch('status')
+  const descriptionMarkdown = watch('descriptionMarkdown')
 
   useEffect(() => {
     if (open) {
@@ -171,13 +177,20 @@ export const KanbanItemFormDialog = ({
     await onUpdate(item.id, {
       ...baseInput,
       status: values.status,
-      position: Number(values.position),
     })
     onOpenChange(false)
   }
 
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (isSaving && !nextOpen) {
+      return
+    }
+
+    onOpenChange(nextOpen)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -195,46 +208,26 @@ export const KanbanItemFormDialog = ({
             {errors.title ? <span className={errorClassName}>{errors.title.message}</span> : null}
           </label>
 
-          <label className={labelClassName}>
-            Description
-            <textarea
-              className={cn(fieldClassName, 'min-h-28 resize-y', errors.descriptionMarkdown && 'border-destructive focus:border-destructive focus:ring-destructive/20')}
-              aria-invalid={Boolean(errors.descriptionMarkdown)}
-              {...register('descriptionMarkdown')}
-            />
-            {errors.descriptionMarkdown ? <span className={errorClassName}>{errors.descriptionMarkdown.message}</span> : null}
-          </label>
+          <KanbanMarkdownDescriptionField
+            errorMessage={errors.descriptionMarkdown?.message}
+            value={descriptionMarkdown}
+            textareaProps={register('descriptionMarkdown')}
+          />
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className={labelClassName}>
-              Assignee
-              <input
-                className={fieldClassName}
-                value={assigneeSearch}
-                placeholder="Search characters"
-                onChange={(event) => setAssigneeSearch(event.target.value)}
-              />
-              <select
-                className={cn(fieldClassName, errors.assigneeId && 'border-destructive focus:border-destructive focus:ring-destructive/20')}
-                aria-invalid={Boolean(errors.assigneeId)}
-                {...register('assigneeId')}
-              >
-                <option value="unassigned">Unassigned</option>
-                {assigneeOptions.map((assignee) => {
-                  return (
-                    <option key={assignee.id} value={assignee.id}>
-                      {assignee.name}
-                    </option>
-                  )
-                })}
-              </select>
-              {searchedCharactersQuery.isFetching ? <span className="text-xs text-muted-foreground">Loading characters...</span> : null}
-              {!searchedCharactersQuery.isFetching && assigneeSearch.trim() && assigneeOptions.length === 0 ? (
-                <span className="text-xs text-muted-foreground">No characters found.</span>
-              ) : null}
-              {searchedCharactersQuery.isError ? <span className={errorClassName}>Characters could not be loaded.</span> : null}
-              {errors.assigneeId ? <span className={errorClassName}>{errors.assigneeId.message}</span> : null}
-            </label>
+            <KanbanAssigneePicker
+              assignees={assigneeOptions}
+              errorMessage={errors.assigneeId?.message}
+              isError={searchedCharactersQuery.isError}
+              isLoading={searchedCharactersQuery.isFetching}
+              search={assigneeSearch}
+              selectedAssigneeId={selectedAssigneeId}
+              onSearchChange={setAssigneeSearch}
+              onSelect={(assigneeId) => {
+                setValue('assigneeId', assigneeId, { shouldDirty: true, shouldTouch: true, shouldValidate: true })
+                void trigger('assigneeId')
+              }}
+            />
 
             <label className={labelClassName}>
               Priority
@@ -266,38 +259,12 @@ export const KanbanItemFormDialog = ({
           </label>
 
           {mode === 'edit' ? (
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className={labelClassName}>
-                Status
-                <select
-                  className={cn(fieldClassName, errors.status && 'border-destructive focus:border-destructive focus:ring-destructive/20')}
-                  aria-invalid={Boolean(errors.status)}
-                  {...register('status')}
-                >
-                  {statusOptions.map((column) => {
-                    return (
-                      <option key={column.id} value={column.id} disabled={column.disabled}>
-                        {column.title}
-                      </option>
-                    )
-                  })}
-                </select>
-                {errors.status ? <span className={errorClassName}>{errors.status.message}</span> : null}
-              </label>
-
-              <label className={labelClassName}>
-                Position
-                <input
-                  className={cn(fieldClassName, errors.position && 'border-destructive focus:border-destructive focus:ring-destructive/20')}
-                  type="number"
-                  min="0"
-                  step="1"
-                  aria-invalid={Boolean(errors.position)}
-                  {...register('position', { valueAsNumber: true })}
-                />
-                {errors.position ? <span className={errorClassName}>{errors.position.message}</span> : null}
-              </label>
-            </div>
+            <KanbanStatusRadioGroup
+              errorMessage={errors.status?.message}
+              options={statusOptions}
+              register={register('status')}
+              value={selectedStatus}
+            />
           ) : null}
 
           <DialogFooter>
@@ -305,7 +272,7 @@ export const KanbanItemFormDialog = ({
               type="button"
               className={secondaryButtonClassName}
               disabled={isSaving}
-              onClick={() => onOpenChange(false)}
+              onClick={() => handleOpenChange(false)}
             >
               Cancel
             </button>
@@ -313,9 +280,14 @@ export const KanbanItemFormDialog = ({
               type="submit"
               className={primaryButtonClassName}
               disabled={isSaving}
+              aria-busy={isSaving}
             >
-              <SaveIcon className="size-4" aria-hidden="true" />
-              Save
+              {isSaving ? (
+                <LoaderCircleIcon className="size-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <SaveIcon className="size-4" aria-hidden="true" />
+              )}
+              {isSaving ? 'Saving' : 'Save'}
             </button>
           </DialogFooter>
         </form>
