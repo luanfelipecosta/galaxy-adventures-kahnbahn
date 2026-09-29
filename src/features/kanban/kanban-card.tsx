@@ -5,6 +5,8 @@ import { combine } from '@atlaskit/pragmatic-drag-and-drop/utils/combine'
 import { Edit3Icon, GripVerticalIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
+import { Skeleton } from '@/components/ui/skeleton'
+
 import { KANBAN_CARD_DROP_TARGET_DATA_TYPE, KANBAN_DRAG_DATA_TYPE } from './kanban.constants'
 import type { KanbanAssignee, KanbanDropEdge, KanbanItem } from './kanban.types'
 import {
@@ -20,6 +22,7 @@ import { KanbanAssigneeAvatar } from './kanban-assignee-avatar'
 type KanbanCardProps = {
   assignee: KanbanAssignee | null
   index: number
+  isAssigneeLoading: boolean
   isDragSource: boolean
   item: KanbanItem
   onDragEnd: () => void
@@ -36,6 +39,7 @@ const priorityClassNames: Record<KanbanItem['priority'], string> = {
 export const KanbanCard = ({
   assignee,
   index,
+  isAssigneeLoading,
   isDragSource,
   item,
   onDragEnd,
@@ -47,7 +51,8 @@ export const KanbanCard = ({
   const [isDragging, setIsDragging] = useState(false)
   const [dropEdge, setDropEdge] = useState<KanbanDropEdge | null>(null)
   const description = item.descriptionMarkdown.trim() || 'No description'
-  const assigneeName = assignee?.name ?? (item.assigneeId ? 'Unknown assignee' : 'Unassigned')
+  const shouldShowAssigneeSkeleton = !assignee && isAssigneeLoading
+  const assigneeName = assignee?.name ?? 'Unknown assignee'
 
   useEffect(() => {
     const element = cardRef.current
@@ -189,10 +194,17 @@ export const KanbanCard = ({
       </div>
 
       <div className="mt-auto flex items-center justify-between gap-3 text-xs">
-        <span className="flex min-w-0 items-center gap-2 text-muted-foreground">
-          <KanbanAssigneeAvatar assignee={assignee} name={assigneeName} />
-          <span className="min-w-0 truncate">{assigneeName}</span>
-        </span>
+        {shouldShowAssigneeSkeleton ? (
+          <span className="flex min-w-0 items-center gap-2" aria-label="Loading assignee">
+            <Skeleton className="size-7 shrink-0 rounded-full" />
+            <Skeleton className="h-3 w-24" />
+          </span>
+        ) : (
+          <span className="flex min-w-0 items-center gap-2 text-muted-foreground">
+            <KanbanAssigneeAvatar assignee={assignee} name={assigneeName} />
+            <span className="min-w-0 truncate">{assigneeName}</span>
+          </span>
+        )}
         <span
           className={`rounded-md border px-2 py-1 font-medium ${priorityClassNames[item.priority]}`}
         >

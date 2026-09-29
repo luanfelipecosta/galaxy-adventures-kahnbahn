@@ -1,5 +1,6 @@
 import { KanbanBoardControlBar } from './kanban-board-control-bar'
 import { KanbanBoardContent } from './kanban-board-content'
+import { KanbanDoneCelebration } from './kanban-done-celebration'
 import { KanbanItemFormDialog } from './kanban-item-form-dialog'
 import { useKanbanBoardView } from './use-kanban-board-view'
 
@@ -42,6 +43,7 @@ export const KanbanBoard = () => {
         activeDragItemId={board.activeDragItemId}
         assigneesById={board.assigneesById}
         hasActiveFilters={board.hasActiveFilters}
+        isAssignedAssigneesLoading={board.isAssignedAssigneesLoading}
         isLoading={board.isLoading}
         items={board.items}
         itemsByStatus={board.itemsByStatus}
@@ -76,6 +78,10 @@ export const KanbanBoard = () => {
         onCreate={board.createItem}
         onUpdate={board.updateItem}
       />
+
+      {board.doneCelebrationKey ? (
+        <KanbanDoneCelebration eventKey={board.doneCelebrationKey} onComplete={board.handleDoneCelebrationComplete} />
+      ) : null}
     </div>
   )
 }

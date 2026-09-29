@@ -9,6 +9,7 @@ type KanbanBoardContentProps = {
   activeDragItemId: string | null
   assigneesById: Map<string, KanbanAssignee>
   hasActiveFilters: boolean
+  isAssignedAssigneesLoading: boolean
   isLoading: boolean
   items: KanbanItem[]
   itemsByStatus: KanbanItemsByStatus
@@ -23,6 +24,7 @@ export const KanbanBoardContent = ({
   activeDragItemId,
   assigneesById,
   hasActiveFilters,
+  isAssignedAssigneesLoading,
   isLoading,
   items,
   itemsByStatus,
@@ -78,6 +80,7 @@ export const KanbanBoardContent = ({
               assigneesById={assigneesById}
               column={column}
               hasActiveFilters={hasActiveFilters}
+              isAssignedAssigneesLoading={isAssignedAssigneesLoading}
               items={itemsByStatus[column.id]}
               onEditItem={onEditItem}
               onMoveItem={onMoveItem}

@@ -1,4 +1,4 @@
-import { CheckIcon, UserRoundIcon } from 'lucide-react'
+import { CheckIcon } from 'lucide-react'
 
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -53,19 +53,6 @@ export const KanbanAssigneeSearchList = ({
             {selectedValue === 'all' ? <CheckIcon className="size-4 shrink-0" aria-hidden="true" /> : null}
           </button>
         ) : null}
-        <button
-          type="button"
-          className={optionClassName}
-          role="menuitemradio"
-          aria-checked={selectedValue === 'unassigned'}
-          onClick={() => onSelect('unassigned')}
-        >
-          <span className="inline-flex items-center gap-2">
-            <UserRoundIcon className="size-4" aria-hidden="true" />
-            Unassigned
-          </span>
-          {selectedValue === 'unassigned' ? <CheckIcon className="size-4 shrink-0" aria-hidden="true" /> : null}
-        </button>
         {isLoading ? (
           <div className="grid gap-1 px-3 py-2" aria-hidden="true">
             <div className="flex min-h-10 items-center justify-between gap-3">

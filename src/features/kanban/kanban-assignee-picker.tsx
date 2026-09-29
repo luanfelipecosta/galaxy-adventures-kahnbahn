@@ -10,6 +10,7 @@ import type { KanbanAssignee } from './kanban.types'
 type KanbanAssigneePickerProps = {
   assignees: KanbanAssignee[]
   errorMessage?: string
+  errorMessageId?: string
   isError: boolean
   isLoading: boolean
   search: string
@@ -21,6 +22,7 @@ type KanbanAssigneePickerProps = {
 export const KanbanAssigneePicker = ({
   assignees,
   errorMessage,
+  errorMessageId,
   isError,
   isLoading,
   search,
@@ -31,7 +33,7 @@ export const KanbanAssigneePicker = ({
   const [isOpen, setIsOpen] = useState(false)
   const pickerRef = useRef<HTMLDivElement | null>(null)
   const selectedAssignee = assignees.find((assignee) => assignee.id === selectedAssigneeId)
-  const selectedName = selectedAssignee?.name ?? (selectedAssigneeId === 'unassigned' ? 'Unassigned' : 'Unknown assignee')
+  const selectedName = selectedAssignee?.name ?? (selectedAssigneeId ? 'Unknown assignee' : 'Choose an assignee')
 
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
@@ -68,6 +70,7 @@ export const KanbanAssigneePicker = ({
         )}
         aria-expanded={isOpen}
         aria-haspopup="menu"
+        aria-describedby={errorMessage ? errorMessageId : undefined}
         aria-invalid={Boolean(errorMessage)}
         onClick={() => setIsOpen((currentIsOpen) => !currentIsOpen)}
       >
@@ -97,7 +100,11 @@ export const KanbanAssigneePicker = ({
           />
         </div>
       ) : null}
-      {errorMessage ? <span className="text-xs font-medium text-destructive">{errorMessage}</span> : null}
+      {errorMessage ? (
+        <span id={errorMessageId} className="text-xs font-medium text-destructive">
+          {errorMessage}
+        </span>
+      ) : null}
     </div>
   )
 }

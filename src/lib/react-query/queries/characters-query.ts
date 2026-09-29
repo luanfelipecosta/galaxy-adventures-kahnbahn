@@ -12,6 +12,7 @@ export const charactersQueryOptions = (
     queryKey: characterQueryKeys.list(variables),
     queryFn: () => getCharacters(variables),
     enabled,
+    staleTime: Infinity,
   })
 }
 
@@ -24,6 +25,7 @@ export const charactersByIdsQueryOptions = (variables: CharactersByIdsQueryVaria
     queryKey: characterQueryKeys.byIds(variables),
     queryFn: () => getCharactersByIds(variables),
     enabled: Array.isArray(variables.ids) ? variables.ids.length > 0 : Boolean(variables.ids),
+    staleTime: Infinity,
   })
 }
 

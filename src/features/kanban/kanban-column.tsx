@@ -21,6 +21,7 @@ type KanbanColumnProps = {
   assigneesById: Map<string, KanbanAssignee>
   column: KanbanColumnType
   hasActiveFilters: boolean
+  isAssignedAssigneesLoading: boolean
   items: KanbanItem[]
   onDragEnd: () => void
   onDragStart: (item: KanbanItem) => void
@@ -33,6 +34,7 @@ export const KanbanColumn = ({
   assigneesById,
   column,
   hasActiveFilters,
+  isAssignedAssigneesLoading,
   items,
   onDragEnd,
   onDragStart,
@@ -146,8 +148,9 @@ export const KanbanColumn = ({
             return (
               <KanbanCard
                 key={item.id}
-                assignee={item.assigneeId ? assigneesById.get(item.assigneeId) ?? null : null}
+                assignee={assigneesById.get(item.assigneeId) ?? null}
                 index={index}
+                isAssigneeLoading={isAssignedAssigneesLoading}
                 isDragSource={isDragSource}
                 item={item}
                 onDragEnd={onDragEnd}

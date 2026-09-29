@@ -55,12 +55,7 @@ const secondaryButtonClassName =
 const kanbanItemFormSchema = z.object({
   title: z.string().trim().min(1, 'Title is required').max(120, 'Title must be 120 characters or fewer'),
   descriptionMarkdown: z.string().max(1200, 'Description must be 1200 characters or fewer'),
-  assigneeId: z.string().refine(
-    (value) => {
-      return value === 'unassigned' || value.trim().length > 0
-    },
-    { message: 'Choose a valid assignee' },
-  ),
+  assigneeId: z.string().trim().min(1, 'Choose an assignee'),
   priority: z.custom<KanbanPriority>(
     (value) => {
       return typeof value === 'string' && KANBAN_PRIORITIES.includes(value as KanbanPriority)
@@ -80,7 +75,7 @@ const getFormValues = (item?: KanbanItem | null): KanbanItemFormValues => {
   return {
     title: item?.title ?? '',
     descriptionMarkdown: item?.descriptionMarkdown ?? '',
-    assigneeId: item?.assigneeId ?? 'unassigned',
+    assigneeId: item?.assigneeId ?? '',
     priority: item?.priority ?? 'medium',
     labels: item?.labels.join(', ') ?? '',
     status: item?.status ?? 'to-do',
@@ -159,26 +154,30 @@ export const KanbanItemFormDialog = ({
     const baseInput = {
       title: values.title.trim(),
       descriptionMarkdown: values.descriptionMarkdown.trim(),
-      assigneeId: values.assigneeId === 'unassigned' ? null : values.assigneeId,
+      assigneeId: values.assigneeId.trim(),
       priority: values.priority,
       labels: normalizeLabels(values.labels),
     }
 
-    if (mode === 'create') {
-      await onCreate(baseInput)
+    try {
+      if (mode === 'create') {
+        await onCreate(baseInput)
+        onOpenChange(false)
+        return
+      }
+
+      if (!item) {
+        return
+      }
+
+      await onUpdate(item.id, {
+        ...baseInput,
+        status: values.status,
+      })
       onOpenChange(false)
-      return
+    } catch {
+      // Save feedback is owned by the board view so the dialog can remain open.
     }
-
-    if (!item) {
-      return
-    }
-
-    await onUpdate(item.id, {
-      ...baseInput,
-      status: values.status,
-    })
-    onOpenChange(false)
   }
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -218,6 +217,7 @@ export const KanbanItemFormDialog = ({
             <KanbanAssigneePicker
               assignees={assigneeOptions}
               errorMessage={errors.assigneeId?.message}
+              errorMessageId="kanban-assignee-error"
               isError={searchedCharactersQuery.isError}
               isLoading={searchedCharactersQuery.isFetching}
               search={assigneeSearch}

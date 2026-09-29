@@ -3,7 +3,7 @@
     "id": "item-rocket-itinerary",
     "title": "Draft moon market itinerary",
     "descriptionMarkdown": "Outline the first three stops, supply windows, and handoff notes for the lunar bazaar route.",
-    "assigneeId": null,
+    "assigneeId": "1",
     "status": "to-do",
     "position": 1000,
     "priority": "medium",
@@ -20,10 +20,70 @@
     ]
   },
   {
+    "id": "item-comet-fuel-budget",
+    "title": "Estimate comet fuel budget",
+    "descriptionMarkdown": "Compare the fuel burn for the quick route against the scenic asteroid-belt detour.",
+    "assigneeId": "4",
+    "status": "to-do",
+    "position": 2000,
+    "priority": "high",
+    "labels": ["finance", "route"],
+    "createdAt": "2026-09-24T10:15:00.000Z",
+    "updatedAt": "2026-09-24T10:15:00.000Z",
+    "logs": [
+      {
+        "id": "log-comet-fuel-budget-created",
+        "type": "created",
+        "message": "Item created in To do.",
+        "createdAt": "2026-09-24T10:15:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "item-starlight-permits",
+    "title": "Request starlight docking permits",
+    "descriptionMarkdown": "Collect station requirements and file the arrival windows for the next expedition batch.",
+    "assigneeId": "5",
+    "status": "to-do",
+    "position": 3000,
+    "priority": "medium",
+    "labels": ["ops", "permits"],
+    "createdAt": "2026-09-24T13:40:00.000Z",
+    "updatedAt": "2026-09-24T13:40:00.000Z",
+    "logs": [
+      {
+        "id": "log-starlight-permits-created",
+        "type": "created",
+        "message": "Item created in To do.",
+        "createdAt": "2026-09-24T13:40:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "item-solar-sail-calibration",
+    "title": "Queue solar sail calibration",
+    "descriptionMarkdown": "List the calibration checkpoints and assign the launch-bay window for the sail test.",
+    "assigneeId": "10",
+    "status": "to-do",
+    "position": 4000,
+    "priority": "low",
+    "labels": ["maintenance", "launch"],
+    "createdAt": "2026-09-25T09:05:00.000Z",
+    "updatedAt": "2026-09-25T09:05:00.000Z",
+    "logs": [
+      {
+        "id": "log-solar-sail-calibration-created",
+        "type": "created",
+        "message": "Item created in To do.",
+        "createdAt": "2026-09-25T09:05:00.000Z"
+      }
+    ]
+  },
+  {
     "id": "item-navigation-check",
     "title": "Verify nebula navigation checks",
     "descriptionMarkdown": "Run through edge cases for low-visibility travel and document any manual override steps.",
-    "assigneeId": null,
+    "assigneeId": "2",
     "status": "doing",
     "position": 1000,
     "priority": "high",
@@ -48,10 +108,66 @@
     ]
   },
   {
+    "id": "item-asteroid-scout-brief",
+    "title": "Review asteroid scout brief",
+    "descriptionMarkdown": "Summarize the latest mineral scan notes and highlight hazards for the flight crew.",
+    "assigneeId": "6",
+    "status": "doing",
+    "position": 2000,
+    "priority": "medium",
+    "labels": ["scouting", "risk"],
+    "createdAt": "2026-09-22T12:20:00.000Z",
+    "updatedAt": "2026-09-25T08:35:00.000Z",
+    "logs": [
+      {
+        "id": "log-asteroid-scout-brief-created",
+        "type": "created",
+        "message": "Item created in To do.",
+        "createdAt": "2026-09-22T12:20:00.000Z"
+      },
+      {
+        "id": "log-asteroid-scout-brief-status",
+        "type": "status",
+        "message": "Moved from To do to Doing.",
+        "createdAt": "2026-09-25T08:35:00.000Z",
+        "fromStatus": "to-do",
+        "toStatus": "doing"
+      }
+    ]
+  },
+  {
+    "id": "item-orbit-snack-inventory",
+    "title": "Balance orbit snack inventory",
+    "descriptionMarkdown": "Check pantry levels against passenger manifests and flag anything that needs restocking.",
+    "assigneeId": "7",
+    "status": "doing",
+    "position": 3000,
+    "priority": "low",
+    "labels": ["supplies", "ops"],
+    "createdAt": "2026-09-23T15:55:00.000Z",
+    "updatedAt": "2026-09-25T16:10:00.000Z",
+    "logs": [
+      {
+        "id": "log-orbit-snack-inventory-created",
+        "type": "created",
+        "message": "Item created in To do.",
+        "createdAt": "2026-09-23T15:55:00.000Z"
+      },
+      {
+        "id": "log-orbit-snack-inventory-status",
+        "type": "status",
+        "message": "Moved from To do to Doing.",
+        "createdAt": "2026-09-25T16:10:00.000Z",
+        "fromStatus": "to-do",
+        "toStatus": "doing"
+      }
+    ]
+  },
+  {
     "id": "item-cargo-manifest",
     "title": "Publish cargo manifest template",
     "descriptionMarkdown": "Finalize the lightweight manifest fields and share the template with mission ops.",
-    "assigneeId": null,
+    "assigneeId": "3",
     "status": "done",
     "position": 1000,
     "priority": "low",
@@ -78,6 +194,78 @@
         "type": "status",
         "message": "Moved from Doing to Done.",
         "createdAt": "2026-09-23T18:20:00.000Z",
+        "fromStatus": "doing",
+        "toStatus": "done"
+      }
+    ]
+  },
+  {
+    "id": "item-transponder-audit",
+    "title": "Archive transponder audit",
+    "descriptionMarkdown": "Attach the final signal report and close out the maintenance checklist.",
+    "assigneeId": "8",
+    "status": "done",
+    "position": 2000,
+    "priority": "medium",
+    "labels": ["maintenance", "archive"],
+    "createdAt": "2026-09-19T11:25:00.000Z",
+    "updatedAt": "2026-09-24T17:05:00.000Z",
+    "logs": [
+      {
+        "id": "log-transponder-audit-created",
+        "type": "created",
+        "message": "Item created in To do.",
+        "createdAt": "2026-09-19T11:25:00.000Z"
+      },
+      {
+        "id": "log-transponder-audit-doing",
+        "type": "status",
+        "message": "Moved from To do to Doing.",
+        "createdAt": "2026-09-20T09:45:00.000Z",
+        "fromStatus": "to-do",
+        "toStatus": "doing"
+      },
+      {
+        "id": "log-transponder-audit-done",
+        "type": "status",
+        "message": "Moved from Doing to Done.",
+        "createdAt": "2026-09-24T17:05:00.000Z",
+        "fromStatus": "doing",
+        "toStatus": "done"
+      }
+    ]
+  },
+  {
+    "id": "item-crew-postcards",
+    "title": "Send crew postcard batch",
+    "descriptionMarkdown": "Confirm addresses, print the photo set, and mark the welcome packets as sent.",
+    "assigneeId": "9",
+    "status": "done",
+    "position": 3000,
+    "priority": "low",
+    "labels": ["crew", "communications"],
+    "createdAt": "2026-09-17T14:50:00.000Z",
+    "updatedAt": "2026-09-22T19:30:00.000Z",
+    "logs": [
+      {
+        "id": "log-crew-postcards-created",
+        "type": "created",
+        "message": "Item created in To do.",
+        "createdAt": "2026-09-17T14:50:00.000Z"
+      },
+      {
+        "id": "log-crew-postcards-doing",
+        "type": "status",
+        "message": "Moved from To do to Doing.",
+        "createdAt": "2026-09-18T10:30:00.000Z",
+        "fromStatus": "to-do",
+        "toStatus": "doing"
+      },
+      {
+        "id": "log-crew-postcards-done",
+        "type": "status",
+        "message": "Moved from Doing to Done.",
+        "createdAt": "2026-09-22T19:30:00.000Z",
         "fromStatus": "doing",
         "toStatus": "done"
       }

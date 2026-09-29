@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useCharactersByIdsQuery, useCharactersQuery } from '@/lib/react-query/queries'
 
@@ -7,6 +8,18 @@ import type { KanbanBoardViewModel } from './kanban-board.types'
 import type { KanbanAssigneeFilter, KanbanItem, KanbanStatus } from './kanban.types'
 import { getPositionForIndex, groupKanbanItemsByStatus, mergeAssigneesById, normalizeCharacterAssignees, sortAssigneesForBoard } from './kanban.utils'
 import { useKanbanBoard } from './use-kanban-board'
+
+const getSaveErrorToastMessage = (error: unknown) => {
+  const apiMessage = error instanceof Error ? error.message.trim() : ''
+
+  return apiMessage && apiMessage !== 'Something went wrong.'
+    ? `Couldn't save item. ${apiMessage}`
+    : "Couldn't save item. Try again."
+}
+
+const allowsDoneCelebration = () => {
+  return typeof window === 'undefined' || !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
 
 export const useKanbanBoardView = (): KanbanBoardViewModel => {
   const { items, errorMessage, isError, isLoading, isSaving, createItem, updateItem } = useKanbanBoard()
@@ -18,9 +31,16 @@ export const useKanbanBoardView = (): KanbanBoardViewModel => {
   const [assigneeFilter, setAssigneeFilter] = useState<KanbanAssigneeFilter>('all')
   const [assigneeSearch, setAssigneeSearch] = useState('')
   const [activeDragItemId, setActiveDragItemId] = useState<string | null>(null)
+  const [doneCelebrationKey, setDoneCelebrationKey] = useState<number | null>(null)
 
   const assignedAssigneeIds = useMemo(() => {
-    return Array.from(new Set(items.map((item) => item.assigneeId).filter((assigneeId): assigneeId is string => Boolean(assigneeId))))
+    return Array.from(
+      new Set(
+        items
+          .map((item) => item.assigneeId.trim())
+          .filter((assigneeId) => assigneeId.length > 0),
+      ),
+    ).sort((firstId, secondId) => firstId.localeCompare(secondId))
   }, [items])
 
   const assignedCharactersQuery = useCharactersByIdsQuery({ ids: assignedAssigneeIds })
@@ -43,9 +63,7 @@ export const useKanbanBoardView = (): KanbanBoardViewModel => {
   const visibleItems = useMemo(() => {
     return items.filter((item) => {
       const matchesPriority = priorityFilter === 'all' || item.priority === priorityFilter
-      const matchesAssignee =
-        assigneeFilter === 'all' ||
-        (assigneeFilter === 'unassigned' ? item.assigneeId === null : item.assigneeId === assigneeFilter)
+      const matchesAssignee = assigneeFilter === 'all' || item.assigneeId === assigneeFilter
 
       return matchesPriority && matchesAssignee
     })
@@ -61,12 +79,65 @@ export const useKanbanBoardView = (): KanbanBoardViewModel => {
     setActiveDragItemId(null)
   }
 
-  const handleMove = (itemId: string, status: KanbanStatus, index: number) => {
+  const showDoneFeedback = () => {
+    toast.success('Congratulations, another day, another adventure, Morty.')
+
+    if (allowsDoneCelebration()) {
+      setDoneCelebrationKey(Date.now())
+    }
+  }
+
+  const createItemWithFeedback = async (input: Parameters<typeof createItem>[0]) => {
+    try {
+      const createdItem = await createItem(input)
+      toast.success('Item saved.')
+
+      return createdItem
+    } catch (error) {
+      toast.error(getSaveErrorToastMessage(error))
+      throw error
+    }
+  }
+
+  const updateItemWithFeedback = async (itemId: string, input: Parameters<typeof updateItem>[1]) => {
+    const previousItem = items.find((item) => item.id === itemId)
+
+    try {
+      const updatedItem = await updateItem(itemId, input)
+
+      if (previousItem?.status !== 'done' && updatedItem.status === 'done') {
+        showDoneFeedback()
+      } else {
+        toast.success('Item saved.')
+      }
+
+      return updatedItem
+    } catch (error) {
+      toast.error(getSaveErrorToastMessage(error))
+      throw error
+    }
+  }
+
+  const handleDoneCelebrationComplete = () => {
+    setDoneCelebrationKey(null)
+  }
+
+  const handleMove = async (itemId: string, status: KanbanStatus, index: number) => {
+    const previousItem = items.find((item) => item.id === itemId)
     const targetItems = itemsByStatus[status].filter((item) => item.id !== itemId)
     const position = getPositionForIndex(targetItems, index)
 
     setActiveDragItemId(null)
-    updateItem(itemId, { position, status })
+
+    try {
+      const updatedItem = await updateItem(itemId, { position, status })
+
+      if (previousItem?.status !== 'done' && updatedItem.status === 'done') {
+        showDoneFeedback()
+      }
+    } catch (error) {
+      toast.error(getSaveErrorToastMessage(error))
+    }
   }
 
   return {
@@ -74,9 +145,11 @@ export const useKanbanBoardView = (): KanbanBoardViewModel => {
     assigneeFilter,
     assigneeSearch,
     assigneesById,
-    createItem,
+    createItem: createItemWithFeedback,
+    doneCelebrationKey,
     editingItem,
     errorMessage,
+    handleDoneCelebrationComplete,
     handleDragEnd,
     handleDragStart,
     handleMove,
@@ -84,6 +157,7 @@ export const useKanbanBoardView = (): KanbanBoardViewModel => {
     isAssigneeError: assignedCharactersQuery.isError || searchedCharactersQuery.isError,
     isAssigneeFilterOpen,
     isAssigneeLoading: assignedCharactersQuery.isFetching || searchedCharactersQuery.isFetching,
+    isAssignedAssigneesLoading: assignedCharactersQuery.isFetching,
     isCreateOpen,
     isError,
     isLoading,
@@ -100,7 +174,7 @@ export const useKanbanBoardView = (): KanbanBoardViewModel => {
     setEditingItem,
     setPriorityFilter,
     setPriorityFilterOpen,
-    updateItem,
+    updateItem: updateItemWithFeedback,
     visibleItems,
   }
 }

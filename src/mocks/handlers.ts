@@ -31,13 +31,17 @@ const isKanbanPriority = (value: unknown): value is KanbanItem['priority'] => {
   return typeof value === 'string' && KANBAN_PRIORITIES.includes(value as KanbanItem['priority'])
 }
 
+const isValidAssigneeId = (value: unknown): value is string => {
+  return typeof value === 'string' && value.trim().length > 0
+}
+
 const validateCreateInput = (input: KanbanItemCreateInput) => {
   if (!input.title?.trim()) {
     return 'Title is required.'
   }
 
-  if (input.assigneeId !== null && typeof input.assigneeId !== 'string') {
-    return 'Assignee must be a string or null.'
+  if (!isValidAssigneeId(input.assigneeId)) {
+    return 'Assignee is required.'
   }
 
   if (!isKanbanPriority(input.priority)) {
@@ -74,11 +78,11 @@ const updateMutableFields = (item: KanbanItem, input: KanbanItemPatchInput, now:
   }
 
   if ('assigneeId' in input) {
-    if (input.assigneeId !== null && typeof input.assigneeId !== 'string') {
-      return 'Assignee must be a string or null.'
+    if (!isValidAssigneeId(input.assigneeId)) {
+      return 'Assignee is required.'
     }
 
-    nextItem.assigneeId = input.assigneeId
+    nextItem.assigneeId = input.assigneeId.trim()
   }
 
   if ('priority' in input) {
@@ -165,7 +169,7 @@ export const handlers = [
       id: createId('item'),
       title: input.title.trim(),
       descriptionMarkdown: input.descriptionMarkdown,
-      assigneeId: input.assigneeId,
+      assigneeId: input.assigneeId.trim(),
       status: 'to-do',
       position: getNextPosition(kanbanItems, 'to-do'),
       priority: input.priority,

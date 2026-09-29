@@ -26,7 +26,7 @@ export type KanbanItem = {
   id: string
   title: string
   descriptionMarkdown: string
-  assigneeId: string | null
+  assigneeId: string
   status: KanbanStatus
   position: number
   priority: KanbanPriority
@@ -42,12 +42,12 @@ export type KanbanAssignee = {
   image: string | null
 }
 
-export type KanbanAssigneeFilter = 'all' | 'unassigned' | string
+export type KanbanAssigneeFilter = 'all' | string
 
 export type KanbanItemCreateInput = {
   title: string
   descriptionMarkdown: string
-  assigneeId: string | null
+  assigneeId: string
   priority: KanbanPriority
   labels: string[]
 }

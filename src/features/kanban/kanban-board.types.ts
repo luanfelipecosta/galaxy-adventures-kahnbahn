@@ -6,12 +6,14 @@ export type KanbanBoardViewState = {
   assigneeFilter: KanbanAssigneeFilter
   assigneeSearch: string
   assigneesById: Map<string, KanbanAssignee>
+  doneCelebrationKey: number | null
   editingItem: KanbanItem | null
   errorMessage: string | null
   hasActiveFilters: boolean
   isAssigneeError: boolean
   isAssigneeFilterOpen: boolean
   isAssigneeLoading: boolean
+  isAssignedAssigneesLoading: boolean
   isCreateOpen: boolean
   isError: boolean
   isLoading: boolean
@@ -26,6 +28,7 @@ export type KanbanBoardViewState = {
 
 export type KanbanBoardViewActions = {
   createItem: (input: import('./kanban.types').KanbanItemCreateInput) => Promise<KanbanItem>
+  handleDoneCelebrationComplete: () => void
   handleDragEnd: () => void
   handleDragStart: (item: KanbanItem) => void
   handleMove: (itemId: string, status: KanbanStatus, index: number) => void

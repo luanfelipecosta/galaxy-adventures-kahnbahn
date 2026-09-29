@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
 
 import { createKanbanItem, getKanbanItems, patchKanbanItem } from './kanban-api'
 import { KANBAN_QUERY_KEYS } from './kanban.constants'
@@ -28,20 +27,13 @@ export const useKanbanItemsQuery = () => {
 export const useKanbanBoard = () => {
   const queryClient = useQueryClient()
   const itemsQuery = useKanbanItemsQuery()
-  const [mutationErrorMessage, setMutationErrorMessage] = useState<string | null>(null)
 
   const createMutation = useMutation({
     mutationFn: createKanbanItem,
-    onMutate: () => {
-      setMutationErrorMessage(null)
-    },
     onSuccess: (createdItem) => {
       queryClient.setQueryData<KanbanItem[]>(KANBAN_QUERY_KEYS.items, (items = []) => {
         return [...items, createdItem]
       })
-    },
-    onError: (error) => {
-      setMutationErrorMessage(getErrorMessage(error))
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: KANBAN_QUERY_KEYS.items })
@@ -51,7 +43,6 @@ export const useKanbanBoard = () => {
   const updateMutation = useMutation<KanbanItem, Error, UpdateKanbanItemVariables, KanbanItemsContext>({
     mutationFn: ({ itemId, input }) => patchKanbanItem(itemId, input),
     onMutate: async ({ itemId, input }) => {
-      setMutationErrorMessage(null)
       await queryClient.cancelQueries({ queryKey: KANBAN_QUERY_KEYS.items })
 
       const previousItems = queryClient.getQueryData<KanbanItem[]>(KANBAN_QUERY_KEYS.items)
@@ -82,8 +73,6 @@ export const useKanbanBoard = () => {
       if (context?.previousItems) {
         queryClient.setQueryData(KANBAN_QUERY_KEYS.items, context.previousItems)
       }
-
-      setMutationErrorMessage(getErrorMessage(error))
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: KANBAN_QUERY_KEYS.items })
@@ -100,8 +89,8 @@ export const useKanbanBoard = () => {
 
   return {
     items: itemsQuery.data ?? [],
-    errorMessage: itemsQuery.error ? getErrorMessage(itemsQuery.error) : mutationErrorMessage,
-    isError: itemsQuery.isError || Boolean(mutationErrorMessage),
+    errorMessage: itemsQuery.error ? getErrorMessage(itemsQuery.error) : null,
+    isError: itemsQuery.isError,
     isLoading: itemsQuery.isPending,
     isSaving: createMutation.isPending || updateMutation.isPending,
     createItem,
