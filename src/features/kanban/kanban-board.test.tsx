@@ -120,7 +120,7 @@ describe('KanbanBoard', () => {
 
     renderWithProviders(<KanbanBoard />)
 
-    expect(screen.getByRole('heading', { name: 'Galaxy Adventures Kanban' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Interdimensional Adventure Board' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'To do' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Doing' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Done' })).toBeInTheDocument()

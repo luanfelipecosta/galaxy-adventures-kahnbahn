@@ -51,8 +51,8 @@ const KanbanBoardView = () => {
     <div className="flex h-full min-h-0 flex-col gap-5">
       <div className="grid gap-5">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-muted-foreground">Workspace</p>
-          <h1 className="mt-2 text-xl font-semibold tracking-normal">Galaxy Adventures Kanban</h1>
+          <p className="text-sm font-medium text-muted-foreground">Mission Control</p>
+          <h1 className="mt-2 text-xl font-semibold tracking-normal">Interdimensional Adventure Board</h1>
         </div>
 
         <KanbanBoardControlBar />
